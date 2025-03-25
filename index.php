@@ -1,5 +1,18 @@
 <?php
 session_start();
+require 'baseDD/database.php'; 
+try {
+    if (!isset($conn) || $conn === null) {
+        throw new Exception("Database connection not established");
+    }
+    $stmt = $conn->prepare("SELECT firstname, lastname, email FROM user");
+    $stmt->execute();
+    $user = $stmt->fetchAll(PDO::FETCH_ASSOC);
+} catch(Exception $e) {
+    // More comprehensive error handling
+    $user = [];
+    $error_message = "ERROR: Could not retrieve user. " . $e->getMessage();
+}
 ?>
 <!DOCTYPE html>
 <html lang="fr">
@@ -8,6 +21,22 @@ session_start();
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Mon Projet PHP Simple</title>
     <link href="assets/style_index.css" rel="stylesheet">
+    <style>
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+        table, th, td {
+            border: 1px solid #ddd;
+            padding: 8px;
+            text-align: left;
+        }
+        .error {
+            color: red;
+            margin: 20px 0;
+        }
+    </style>
 </head>
 <body>
     <header class="navbar">
@@ -25,5 +54,39 @@ session_start();
             ?>
         </div>
     </header>
+
+    <h1>Users List</h1>
+    
+    <?php if (isset($error_message)): ?>
+        <div class="error">
+            <?php echo htmlspecialchars($error_message); ?>
+        </div>
+    <?php endif; ?>
+
+    <table>
+        <thead>
+            <tr>
+                <th>First Name</th>
+                <th>Last Name</th>
+                <th>Email</th>
+            </tr>
+        </thead>
+        <tbody>
+            <?php if (!empty($user)): ?>
+                <?php foreach ($user as $users): ?>
+                    <tr>
+                        <td><?php echo htmlspecialchars($users['firstname']); ?></td>
+                        <td><?php echo htmlspecialchars($users['lastname']); ?></td>
+                        <td><?php echo htmlspecialchars($users['email']); ?></td>
+                    </tr>
+                <?php endforeach; ?>
+            <?php else: ?>
+                <tr>
+                    <td colspan="3">No users found</td>
+                </tr>
+            <?php endif; ?>
+        </tbody>
+    </table>
+
 </body>
 </html>
