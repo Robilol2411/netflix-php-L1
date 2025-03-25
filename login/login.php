@@ -12,6 +12,9 @@ require "../baseDD/database.php";
     <link href="../assets/style.css" rel="stylesheet">
 </head>
 <body>
+<header>
+    <a href="..\index.php">Acceuil</a>
+</header>
     <div class="center">
         <form class="form" action="login.php" method="post">
         <span class="input-span">

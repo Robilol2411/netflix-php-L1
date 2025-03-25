@@ -1,37 +1,73 @@
 <?php
 session_start();
-if (!isset($_SESSION['user_id'])) {
-    header("Location: index.php");
-    exit();
+require '../baseDD/database.php';
+$articles = [];
+$errorMessage = '';
+
+try {
+    $query = '
+        SELECT article.userId, article.title, article.image, article.created_by, article.description, article.created_at AS article_date,
+               user.firstName, user.lastName
+        FROM article
+        LEFT JOIN user ON article.userId = user.id
+    ';
+    $articles = $conn->query($query)->fetchAll(PDO::FETCH_ASSOC);
+
+} catch (PDOException $e) {
+    $errorMessage = "Erreur lors de la récupération des articles ou des utilisateurs : " . $e->getMessage();
 }
-$login_success = isset($_SESSION['login_success']) ? $_SESSION['login_success'] : false;
-unset($_SESSION['login_success']); 
+
 ?>
+
 <!DOCTYPE html>
 <html lang="fr">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Articles - Mon Projet PHP</title>
-    <link href="assets/style.css" rel="stylesheet">
+    <title>Mon Projet PHP Simple</title>
+    <link href="../assets/style_index.css" rel="stylesheet">
 </head>
 <body>
-    <div class="container">
-        <?php if ($login_success): ?>
-            <div class="success-message">
-                Connexion réussie! Bienvenue, <?php echo htmlspecialchars($_SESSION['username']); ?>
-            </div>
-        <?php endif; ?>
+<header class="navbar">
+        <a href="../index.php" class="logo">CRUD</a>
+        <div class="nav-links">
+            <?php 
+            if (isset($_SESSION['user_id'])) {
+                echo '<a href="create_article.php">Create article</a>';
+            } ?>
+            <?php
+            if (!isset($_SESSION['user_id'])) {
+                echo '<a href="login/login.php">Login</a>';
+                echo '<a href="login/register.php">Register</a>';
+            } else {
+                echo '<a href="login/logout.php">Logout</a>';
+            }
+            ?>
+        </div>
+    </header>
 
-        <h1>Mes Articles</h1>
-        
-        <div class="user-info">
-            <p>Connecté en tant que: <?php echo htmlspecialchars($_SESSION['username']); ?></p>
-            <a href="../create/logout.php" class="logout-button">Déconnexion</a>
-        </div>
-        <div class="articles-list">
-            <p>Aucun article pour le moment.</p>
-        </div>
-    </div>
+    <h1>Les Articles :</h1>
+
+    <?php if (!empty($articles)): ?>
+        <?php foreach ($articles as $article): ?>
+            <div class="articles">
+                <p>
+                    Titre : <?php echo htmlspecialchars($article['title']); ?><br><br>
+                    Description : <?php echo htmlspecialchars($article['description']); ?><br><br>
+                    Auteur : <?php echo htmlspecialchars($article['created_by']); ?><br>
+                    Date de publication : <?php echo date('d/m/Y H:i', strtotime($article['article_date'])); ?><br>
+                </p>
+            </div>
+        <?php endforeach; ?>
+    <?php else: ?>
+        <p>Aucun article disponible.</p>
+    <?php endif; ?>
+
+    <?php if (isset($errorMessage)): ?>
+        <p style="color: red;"><?php echo htmlspecialchars($errorMessage); ?></p>
+    <?php endif; ?>
+
+
 </body>
 </html>
+

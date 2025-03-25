@@ -59,6 +59,9 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" &&
     <link href="../assets/style.css" rel="stylesheet">
 </head>
 <body>
+<header>
+    <a href="..\index.php">Acceuil</a>
+</header>
     <div class="center">
         <form class="form" action="register.php" method="post">
             <span class="input-span">
