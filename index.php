@@ -1,3 +1,6 @@
+<?php
+session_start();
+?>
 <!DOCTYPE html>
 <html lang="fr">
 <head>
@@ -12,9 +15,14 @@
         <div class="nav-links">
             <a href="articles/articles.php">Articles</a>
             <a href="articles/create.php">Create article</a>
-            <a href="login/login.php">Login</a>
-            <a href="login/logout.php">Logout</a>
-            <a href="login/register.php">Register</a>
+            <?php
+            if (!isset($_SESSION['user_id'])) {
+                echo '<a href="login/login.php">Login</a>';
+                echo '<a href="login/register.php">Register</a>';
+            } else {
+                echo '<a href="login/logout.php">Logout</a>';
+            }
+            ?>
         </div>
     </header>
 </body>
