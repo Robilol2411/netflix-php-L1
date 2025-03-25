@@ -22,8 +22,8 @@ services:
     environment:
       MYSQL_ROOT_PASSWORD: root
       MYSQL_DATABASE: monsite
-      MYSQL_USER: utilisateur
-      MYSQL_PASSWORD: motdepasse
+      MYSQL_USER: user
+      MYSQL_PASSWORD: password
     ports:
       - "3306:3306"
     restart: always
