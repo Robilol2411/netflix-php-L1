@@ -9,7 +9,6 @@ try {
     $stmt->execute();
     $user = $stmt->fetchAll(PDO::FETCH_ASSOC);
 } catch(Exception $e) {
-    // More comprehensive error handling
     $user = [];
     $error_message = "ERROR: Could not retrieve user. " . $e->getMessage();
 }
@@ -21,22 +20,6 @@ try {
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Mon Projet PHP Simple</title>
     <link href="assets/style_index.css" rel="stylesheet">
-    <style>
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            margin-top: 20px;
-        }
-        table, th, td {
-            border: 1px solid #ddd;
-            padding: 8px;
-            text-align: left;
-        }
-        .error {
-            color: red;
-            margin: 20px 0;
-        }
-    </style>
 </head>
 <body>
     <header class="navbar">
