@@ -10,7 +10,7 @@
 </head>
 <body>
     <div class="center">
-        <form class="form" action="create.php" method="post">
+        <form class="form" action="register.php" method="post">
         <span class="input-span">
             <label for="email" class="label">Email</label>
             <input type="email" name="email" id="email"
@@ -25,7 +25,7 @@
         /></span>
         </span>
         <input class="submit" type="submit" value="Create user" />
-        <span class="span">You have an account? <a href="../index.php">Log in</a></span>
+        <span class="span">You have an account? <a href="login.php">Log in</a></span>
         </form>
     </div>
     <?php 
@@ -61,10 +61,9 @@
             }
             $password = trim($_POST["password"]);
             $hashed_password = password_hash($password, PASSWORD_DEFAULT);
-            $description = trim($_POST["description"]);
             if ($erruser == 0 && $errmail == 0){
-                $stmt = $conn->prepare("INSERT INTO user (email,username,password,description) VALUES (?,?,?,?)");
-                $result = $stmt->execute([$email,$username,$hashed_password,$description]);
+                $stmt = $conn->prepare("INSERT INTO user (email,username,password) VALUES (?,?,?)");
+                $result = $stmt->execute([$email,$username,$hashed_password]);
             }
         } else {
             ?> <p> Un champ n'est pas remplie </p> <?php
