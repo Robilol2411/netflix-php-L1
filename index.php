@@ -43,96 +43,45 @@ try {
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>CRUD Application</title>
+    <title>Location de films</title>
     <link href="assets/style_index.css" rel="stylesheet">
 </head>
 <body>
     <header class="navbar">
-        <a href="#" class="logo">CRUD</a>
+        <a href="#" class="logo">LoueTonFilm.com</a>
+        <div class="search-container">
+            <form action="recherche.php" method="GET">
+                <input type="text" name="q" class="search-input" placeholder="Rechercher...">
+                <svg class="search-icon" xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <circle cx="11" cy="11" r="8"></circle>
+                    <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+                </svg>
+                <button type="submit">Rechercher</button>
+            </form>
+        </div>
         <div class="nav-links">
-            <a href="articles/articles.php">Articles</a>
             <?php 
             if (isset($_SESSION['user_id'])) {
-                echo '<a href="articles/create_article.php">Create Article</a>';
+                echo '<a href="articles/create_article.php" class="image-swap-container"><div class="image-swap-container">
+                            <img class="default" src="assets/photo/shop2.png" alt="Default image">
+                            <img class="hover" src="assets/photo/shop.png" alt="Hover image">
+                    </div></a>';
             } 
             ?>
             <?php
             if (!isset($_SESSION['user_id'])) {
-                echo '<a href="login/login.php">Login</a>';
-                echo '<a href="login/register.php">Register</a>';
+                echo '<a href="login/login.php">Se connecter</a>';
+                echo '<a href="login/register.php">Nouveau compte</a>';
             } else {
-                echo '<a href="login/logout.php">Logout</a>';
+                echo '<a href="login/logout.php">Se déconnecter</a>';
             }
             ?>
         </div>
     </header>
 
     <main>
-        <section>
-        <h1>Les Articles :</h1>
-
-        <?php if ($articles > 10): ?>
-            <?php foreach ($articles as $article): ?>
-                <div class="articles">
-                    <p>
-                        Titre : <?php echo htmlspecialchars($article['title']); ?><br><br>
-                        Description : <?php echo htmlspecialchars($article['description']); ?><br><br>
-                        Auteur : <?php echo htmlspecialchars($article['created_by']); ?><br>
-                        Date de publication : <?php echo date('d/m/Y H:i', strtotime($article['article_date'])); ?><br>
-                    </p>
-                </div>
-            <?php endforeach; ?>
-        <?php else: ?>
-            <p>Aucun article disponible.</p>
-        <?php endif; ?>
-
-        <?php if (isset($errorMessage)): ?>
-            <p style="color: red;"><?php echo htmlspecialchars($errorMessage); ?></p>
-        <?php endif; ?>
-        </section>
-
-        <section>
-            <h1>Users</h1>
-            <?php if (!empty($errorMessages)): ?>
-                <div class="error-messages">
-                    <?php foreach ($errorMessages as $error): ?>
-                        <p style="color: red;"><?php echo htmlspecialchars($error); ?></p>
-                    <?php endforeach; ?>
-                </div>
-            <?php endif; ?>
-
-            <table>
-                <thead>
-                    <tr>
-                        <th>First Name</th>
-                        <th>Last Name</th>
-                        <th>Email</th>
-                        <th>Actions</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <?php foreach ($users as $user): ?>
-                        <tr>
-                            <td><?php echo htmlspecialchars($user['firstname']); ?></td>
-                            <td><?php echo htmlspecialchars($user['lastname']); ?></td>
-                            <td><?php echo htmlspecialchars($user['email']); ?></td>
-                            <td>
-                                <div class="btn-container">
-                                    <a class="btn btn-edit" href="editUser.php?id=<?php echo htmlspecialchars($user['id']); ?>">Edit</a>
-                                    <?php if (isset($_SESSION['user_id']) && $_SESSION['user_id'] != $user['id']): ?>
-                                        <a class="btn btn-delete" 
-                                           href="deleteUser.php?id=<?php echo htmlspecialchars($user['id']); ?>" 
-                                           onclick="return confirm('Are you sure you want to delete this user?');">
-                                            Delete
-                                        </a>
-                                    <?php endif; ?>
-                                </div>
-                            </td>
-                        </tr>
-                    <?php endforeach; ?>
-                </tbody>
-            </table>
-        </section>
+        <h1>Bienvenue sur notre site LoueTonFilm.com</h1>
+        <h2>Revendeur officiel des meilleurs films du moment</h2>
     </main>
 </body>
 </html>
