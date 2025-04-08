@@ -37,10 +37,10 @@ try {
             } ?>
             <?php
             if (!isset($_SESSION['user_id'])) {
-                echo '<a href="login/login.php">Login</a>';
-                echo '<a href="login/register.php">Register</a>';
+                echo '<a href="../login/login.php">Login</a>';
+                echo '<a href="../login/register.php">Register</a>';
             } else {
-                echo '<a href="login/logout.php">Logout</a>';
+                echo '<a href="../login/logout.php">Logout</a>';
             }
             ?>
         </div>
