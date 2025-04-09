@@ -194,7 +194,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['change_password'])) {
                     <div class="form-group">
                         <label for="confirm_password">Confirmer le nouveau mot de passe</label>
                         <input type="password" id="confirm_password" name="confirm_password" required>
-                    </div>
+                    </div></br>
                     <button type="submit" name="change_password" class="submit-btn">Mettre à jour</button>
                 </form>
             </div>
