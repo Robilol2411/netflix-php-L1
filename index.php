@@ -148,26 +148,31 @@ if (isset($_POST['add_to_cart']) && isset($_POST['movie_id']) && isset($_SESSION
         
         <?php if (!empty($films)): ?>
             <div class="movie-grid">
-                <?php foreach ($films as $film): ?>
-                    <div class="movie-card">
-                        <img src="<?php echo htmlspecialchars($film['poster_path']); ?>" alt="<?php echo htmlspecialchars($film['title']); ?>" class="movie-poster">
-                        <div class="movie-info">
-                            <div class="movie-title"><?php echo htmlspecialchars($film['title']); ?></div>
-                            <div class="movie-price"><?php echo htmlspecialchars(number_format($film['price'], 2)); ?></div>
-                            <p class="movie-desc"><?php echo htmlspecialchars(substr($film['description'], 0, 50)) . '...'; ?></p>
-                            
-                            <?php if (isset($_SESSION['user_id'])): ?>
-                                <form method="POST" class="add-to-cart-form">
-                                    <input type="hidden" name="movie_id" value="<?php echo $film['id']; ?>">
-                                    <button type="submit" name="add_to_cart" class="add-to-cart-btn">Ajouter au panier</button>
-                                </form>
-                            <?php else: ?>
-                                <a href="login/login.php" class="login-to-buy">Connectez-vous pour acheter</a>
-                            <?php endif; ?>
-                        </div>
-                    </div>
-                <?php endforeach; ?>
+    <?php foreach ($films as $film): ?>
+        <div class="movie-card">
+            <a href="movies.php?id=<?php echo $film['id']; ?>">
+                <img src="<?php echo htmlspecialchars($film['poster_path']); ?>" alt="<?php echo htmlspecialchars($film['title']); ?>" class="movie-poster">
+            </a>
+            <div class="movie-info">
+                <a href="movies.php?id=<?php echo $film['id']; ?>" class="movie-title">
+                    <?php echo htmlspecialchars($film['title']); ?>
+                </a>
+                <div class="movie-price"><?php echo htmlspecialchars(number_format($film['price'], 2)); ?> €</div>
+                <p class="movie-desc"><?php echo htmlspecialchars(substr($film['description'], 0, 50)) . '...'; ?></p>
+                
+                <?php if (isset($_SESSION['user_id'])): ?>
+                    <form method="POST" class="add-to-cart-form">
+                        <input type="hidden" name="movie_id" value="<?php echo $film['id']; ?>">
+                        <button type="submit" name="add_to_cart" class="add-to-cart-btn">Ajouter au panier</button>
+                    </form>
+                <?php else: ?>
+                    <a href="login/login.php" class="login-to-buy">Connectez-vous pour acheter</a>
+                <?php endif; ?>
             </div>
+        </div>
+    <?php endforeach; ?>
+</div>
+
         <?php else: ?>
             <p class="no-content">Aucun film n'est disponible pour le moment.</p>
         <?php endif; ?>

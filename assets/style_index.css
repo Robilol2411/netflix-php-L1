@@ -2,12 +2,7 @@ html {
     font-size: 16px;
     font-family: 'Poppins', sans-serif;
 }
-html {
-    font-size: 16px;
-    font-family: 'Poppins', sans-serif;
-  }
-  
-  body {
+body {
     background: radial-gradient(
       ellipse at center,
       #DEC9E9 0%,
