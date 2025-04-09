@@ -96,7 +96,7 @@ if (isset($_POST['add_to_cart']) && isset($_POST['movie_id']) && isset($_SESSION
 </head>
 <body>
     <header class="navbar">
-        <a href="index.php" class="logo">LoueTonFilm.com</a>
+        <a href="index.php" class="logo">CINEMAX</a>
         <div class="search-container">
             <form action="recherche.php" method="GET">
                 <input type="text" name="q" class="search-input" placeholder="Rechercher...">
@@ -140,7 +140,7 @@ if (isset($_POST['add_to_cart']) && isset($_POST['movie_id']) && isset($_SESSION
             <?php endforeach; ?>
         <?php endif; ?>
         
-        <h1>Bienvenue sur LoueTonFilm.com</h1>
+        <h1>Bienvenue sur CINEMAX</h1>
         <h2>Revendeur officiel des meilleurs films du moment</h2>
         
         <!-- Vitrine des films -->

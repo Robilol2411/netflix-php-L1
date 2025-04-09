@@ -104,12 +104,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['change_password'])) {
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Mon espace - LoueTonFilm.com</title>
+    <title>Mon espace - CINEMAX</title>
     <link href="../assets/style_index.css" rel="stylesheet">
 </head>
 <body>
     <header class="navbar">
-        <a href="../index.php" class="logo">LoueTonFilm.com</a>
+        <a href="../index.php" class="logo">CINEMAX</a>
         <div class="search-container">
             <form action="../recherche.php" method="GET">
                 <input type="text" name="q" class="search-input" placeholder="Rechercher un film...">
