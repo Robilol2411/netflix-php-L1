@@ -1,6 +1,6 @@
 <?php
 session_start();
-require 'baseDD/database.php';
+require '../baseDD/database.php';
 
 $articles = [];
 $users = [];
@@ -27,7 +27,7 @@ try {
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Location de films</title>
-    <link href="assets/style_index.css" rel="stylesheet">
+    <link href="../assets/style_index.css" rel="stylesheet">
 </head>
 <body>
     <header class="navbar">
@@ -45,27 +45,32 @@ try {
         <div class="nav-links">
             <?php 
             if (isset($_SESSION['user_id'])) {
-                echo '<a href="utilisateur/user.php">Profile</a>';
                 echo '<a href="articles/create_article.php" class="image-swap-container"><div class="image-swap-container">
-                            <img class="default" src="assets/photo/shop2.png" alt="Default image">
-                            <img class="hover" src="assets/photo/shop.png" alt="Hover image">
+                            <img class="default" src="../assets/photo/shop2.png" alt="Default image">
+                            <img class="hover" src="../assets/photo/shop.png" alt="Hover image">
                     </div></a>';
             } 
             ?>
             <?php
-            if (!isset($_SESSION['user_id'])) {
-                echo '<a href="login/login.php">Se connecter</a>';
-                echo '<a href="login/register.php">Nouveau compte</a>';
-            } else {
-                echo '<a href="login/logout.php">Se déconnecter</a>';
-            }
+            echo '<a href="login/logout.php">Se déconnecter</a>';
             ?>
         </div>
     </header>
 
     <main>
-        <h1>Bienvenue sur notre site LoueTonFilm.com</h1>
-        <h2>Revendeur officiel des meilleurs films du moment</h2>
+        <h2>Vos films :</h2>
+        <div>
+
+        </div>
+        <h2>Information sur votre compte:</h2>
+        <div>
+            <p>
+                <strong>Nom:</strong> <?php echo htmlspecialchars($_SESSION['lastname']); ?><br>
+                <strong>Prénom:</strong> <?php echo htmlspecialchars($_SESSION['firstname']); ?><br>
+                <strong>Email:</strong> <?php echo htmlspecialchars($_SESSION['email']); ?><br>
+                <strong>ID:</strong> <?php echo htmlspecialchars($_SESSION['user_id']); ?><br>
+                <strong>Inscrit le:</strong> <?php echo htmlspecialchars($_SESSION['created_at']); ?><br>
+        </div>
     </main>
 </body>
 </html>
