@@ -123,7 +123,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['change_password'])) {
         <div class="nav-links">
             <?php 
             if (isset($_SESSION['user_id'])) {
-                echo '<a href="../articles/create_article.php" class="image-swap-container"><div class="image-swap-container">
+                echo '<a href="../utilisateur/panier.php" class="image-swap-container"><div class="image-swap-container">
                             <img class="default" src="../assets/photo/shop2.png" alt="Boutique">
                             <img class="hover" src="../assets/photo/shop.png" alt="Boutique survolée">
                     </div></a>';
