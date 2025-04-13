@@ -5,6 +5,45 @@ require 'baseDD/database.php';
 $searchResults = [];
 $errorMessages = [];
 
+// Handle "Add to Cart" functionality
+if (isset($_POST['add_to_cart']) && isset($_POST['movie_id']) && isset($_SESSION['user_id'])) {
+    try {
+        $movieId = $_POST['movie_id'];
+
+        // Check if the movie is already in the cart
+        $checkQuery = "SELECT id, quantity FROM cart WHERE user_id = :user_id AND movie_id = :movie_id";
+        $stmt = $conn->prepare($checkQuery);
+        $stmt->bindParam(':user_id', $_SESSION['user_id']);
+        $stmt->bindParam(':movie_id', $movieId);
+        $stmt->execute();
+        $existingItem = $stmt->fetch(PDO::FETCH_ASSOC);
+
+        if ($existingItem) {
+            // Update the quantity
+            $newQuantity = $existingItem['quantity'] + 1;
+            $updateQuery = "UPDATE cart SET quantity = :quantity WHERE id = :id";
+            $stmt = $conn->prepare($updateQuery);
+            $stmt->bindParam(':quantity', $newQuantity);
+            $stmt->bindParam(':id', $existingItem['id']);
+            $stmt->execute();
+        } else {
+            // Add a new item to the cart
+            $insertQuery = "INSERT INTO cart (user_id, movie_id, quantity) VALUES (:user_id, :movie_id, 1)";
+            $stmt = $conn->prepare($insertQuery);
+            $stmt->bindParam(':user_id', $_SESSION['user_id']);
+            $stmt->bindParam(':movie_id', $movieId);
+            $stmt->execute();
+        }
+
+        // Redirect to avoid multiple form submissions
+        header('Location: recherche.php?q=' . urlencode($_GET['q']) . '&added=1');
+        exit;
+    } catch (Exception $e) {
+        $errorMessages[] = "Erreur lors de l'ajout au panier: " . $e->getMessage();
+    }
+}
+
+// Fetch movies from TMDB and handle search logic
 if (isset($_GET['q']) && !empty($_GET['q'])) {
     $query = htmlspecialchars($_GET['q']); // Sanitize user input
     $apiKey = 'b4d10555719ced3748435bc30d8b3f7b'; // Your TMDB API key
@@ -14,7 +53,6 @@ if (isset($_GET['q']) && !empty($_GET['q'])) {
         // Fetch movies from TMDB
         $response = file_get_contents($url);
         $movies = json_decode($response, true)['results'];
-
         foreach ($movies as $movie) {
             $title = $movie['title'];
             $description = $movie['overview'];
@@ -23,11 +61,15 @@ if (isset($_GET['q']) && !empty($_GET['q'])) {
                 : "https://via.placeholder.com/500x750?text=No+Image"; // Default placeholder image
             $releaseDate = !empty($movie['release_date']) ? $movie['release_date'] : null;
             $price = rand(599, 1999) / 100; // Random price between 5.99 and 19.99
-
-            // Insert into database
+        
+            // Insert into database or update if it already exists
             $stmt = $conn->prepare("INSERT INTO movies (title, description, poster_path, release_date, price, created_at, updated_at) 
                                     VALUES (:title, :description, :poster_path, :release_date, :price, NOW(), NOW())
-                                    ON DUPLICATE KEY UPDATE updated_at = NOW()");
+                                    ON DUPLICATE KEY UPDATE 
+                                        updated_at = NOW(), 
+                                        description = VALUES(description), 
+                                        poster_path = VALUES(poster_path), 
+                                        release_date = VALUES(release_date)");
             $stmt->execute([
                 ':title' => $title,
                 ':description' => $description,
@@ -110,7 +152,7 @@ if (isset($_GET['q']) && !empty($_GET['q'])) {
                             <a href="movies.php?id=<?php echo $movie['id']; ?>" class="movie-title">
                                 <?php echo htmlspecialchars($movie['title']); ?>
                             </a>
-                            <div class="movie-price"><?php echo htmlspecialchars(number_format($movie['price'], 2)); ?> €</div>
+                            <div class="movie-price"><?php echo htmlspecialchars(number_format($movie['price'], 2)); ?> </div>
                             <p class="movie-desc"><?php echo htmlspecialchars(substr($movie['description'], 0, 50)) . '...'; ?></p>
                             
                             <?php if (isset($_SESSION['user_id'])): ?>
