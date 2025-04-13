@@ -86,7 +86,10 @@ if (isset($_POST['add_to_cart']) && isset($_POST['movie_id']) && isset($_SESSION
 }
 
 try {
-    $filmsQuery = "SELECT id, title, description, poster_path, price FROM movies ORDER BY release_date DESC LIMIT 8";
+    $filmsQuery = "SELECT id, title, description, poster_path, price, release_date 
+                   FROM movies 
+                   ORDER BY release_date DESC 
+                   LIMIT 8";
     $stmt = $conn->prepare($filmsQuery);
     $stmt->execute();
     $films = $stmt->fetchAll(PDO::FETCH_ASSOC);
@@ -167,7 +170,7 @@ try {
                 <a href="movies.php?id=<?php echo $film['id']; ?>" class="movie-title">
                     <?php echo htmlspecialchars($film['title']); ?>
                 </a>
-                <div class="movie-price"><?php echo htmlspecialchars(number_format($film['price'], 2)); ?> €</div>
+                <div class="movie-price"><?php echo htmlspecialchars(number_format($film['price'], 2)); ?> </div>
                 <p class="movie-desc"><?php echo htmlspecialchars(substr($film['description'], 0, 50)) . '...'; ?></p>
                 
                 <?php if (isset($_SESSION['user_id'])): ?>
