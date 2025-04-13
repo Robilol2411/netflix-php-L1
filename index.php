@@ -84,6 +84,16 @@ if (isset($_POST['add_to_cart']) && isset($_POST['movie_id']) && isset($_SESSION
         $errorMessages[] = "Erreur lors de l'ajout au panier: " . $e->getMessage();
     }
 }
+
+try {
+    $filmsQuery = "SELECT id, title, description, poster_path, price FROM movies ORDER BY release_date DESC LIMIT 8";
+    $stmt = $conn->prepare($filmsQuery);
+    $stmt->execute();
+    $films = $stmt->fetchAll(PDO::FETCH_ASSOC);
+} catch(Exception $e) {
+    $errorMessages[] = "Erreur lors de la récupération des films: " . $e->getMessage();
+    $films = [];
+}
 ?>
 
 <!DOCTYPE html>
@@ -104,7 +114,7 @@ if (isset($_POST['add_to_cart']) && isset($_POST['movie_id']) && isset($_SESSION
                     <circle cx="11" cy="11" r="8"></circle>
                     <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
                 </svg>
-                <button type="submit">Rechercher</button>
+                <button type="submit" id="search-button">Rechercher</button>
             </form>
         </div>
         <div class="nav-links">

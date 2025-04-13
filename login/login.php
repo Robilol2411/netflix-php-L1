@@ -10,11 +10,12 @@ require "../baseDD/database.php";
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Mon Projet PHP Simple</title>
     <link href="../assets/style_login.css" rel="stylesheet">
+
 </head>
 <body>
-<header>
-    <a href="..\index.php">Acceuil</a>
-</header>
+<header class="navbar">
+        <a href="../index.php" class="logo">CINEMAX</a>
+    </header>
     <div class="center">
         <form class="form" action="login.php" method="post">
         <span class="input-span">
