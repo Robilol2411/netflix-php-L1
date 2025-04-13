@@ -9,7 +9,7 @@ require "../baseDD/database.php";
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Mon Projet PHP Simple</title>
-    <link href="../assets/style.css" rel="stylesheet">
+    <link href="../assets/style_login.css" rel="stylesheet">
 </head>
 <body>
 <header>
