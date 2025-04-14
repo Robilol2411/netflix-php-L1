@@ -1,68 +1,69 @@
 <?php
 session_start();
 require 'baseDD/database.php';
+require 'baseDD/envapi.php';
+
+if (!isset($_SESSION['user_id'])) {
+    die('Vous devez être connecté pour effectuer cette action.');
+}
 
 $searchResults = [];
 $errorMessages = [];
 
-// Handle "Add to Cart" functionality
-if (isset($_POST['add_to_cart']) && isset($_POST['movie_id']) && isset($_SESSION['user_id'])) {
-    try {
-        $movieId = $_POST['movie_id'];
+if (isset($_POST['add_to_cart']) && isset($_POST['movie_id'])) {
+    $movieId = filter_var($_POST['movie_id'], FILTER_VALIDATE_INT);
+    if (!$movieId) {
+        die('Invalid movie ID.');
+    }
 
-        // Check if the movie is already in the cart
+    try {
         $checkQuery = "SELECT id, quantity FROM cart WHERE user_id = :user_id AND movie_id = :movie_id";
         $stmt = $conn->prepare($checkQuery);
-        $stmt->bindParam(':user_id', $_SESSION['user_id']);
-        $stmt->bindParam(':movie_id', $movieId);
+        $stmt->bindParam(':user_id', $_SESSION['user_id'], PDO::PARAM_INT);
+        $stmt->bindParam(':movie_id', $movieId, PDO::PARAM_INT);
         $stmt->execute();
         $existingItem = $stmt->fetch(PDO::FETCH_ASSOC);
 
         if ($existingItem) {
-            // Update the quantity
             $newQuantity = $existingItem['quantity'] + 1;
             $updateQuery = "UPDATE cart SET quantity = :quantity WHERE id = :id";
             $stmt = $conn->prepare($updateQuery);
-            $stmt->bindParam(':quantity', $newQuantity);
-            $stmt->bindParam(':id', $existingItem['id']);
+            $stmt->bindParam(':quantity', $newQuantity, PDO::PARAM_INT);
+            $stmt->bindParam(':id', $existingItem['id'], PDO::PARAM_INT);
             $stmt->execute();
         } else {
-            // Add a new item to the cart
             $insertQuery = "INSERT INTO cart (user_id, movie_id, quantity) VALUES (:user_id, :movie_id, 1)";
             $stmt = $conn->prepare($insertQuery);
-            $stmt->bindParam(':user_id', $_SESSION['user_id']);
-            $stmt->bindParam(':movie_id', $movieId);
+            $stmt->bindParam(':user_id', $_SESSION['user_id'], PDO::PARAM_INT);
+            $stmt->bindParam(':movie_id', $movieId, PDO::PARAM_INT);
             $stmt->execute();
         }
-
-        // Redirect to avoid multiple form submissions
         header('Location: recherche.php?q=' . urlencode($_GET['q']) . '&added=1');
         exit;
     } catch (Exception $e) {
-        $errorMessages[] = "Erreur lors de l'ajout au panier: " . $e->getMessage();
+        error_log($e->getMessage());
+        $errorMessages[] = "Une erreur est survenue. Veuillez réessayer.";
     }
 }
 
-// Fetch movies from TMDB and handle search logic
 if (isset($_GET['q']) && !empty($_GET['q'])) {
-    $query = htmlspecialchars($_GET['q']); // Sanitize user input
-    $apiKey = 'b4d10555719ced3748435bc30d8b3f7b'; // Your TMDB API key
+    $query = htmlspecialchars($_GET['q'], ENT_QUOTES, 'UTF-8');
+    $apiKey = $TMDB_API_KEY;
+    if (!$apiKey) {
+        die('API key not configured.');
+    }
     $url = "https://api.themoviedb.org/3/search/movie?api_key=$apiKey&language=en-US&query=" . urlencode($query);
 
     try {
-        // Fetch movies from TMDB
         $response = file_get_contents($url);
         $movies = json_decode($response, true)['results'];
         foreach ($movies as $movie) {
             $title = $movie['title'];
             $description = $movie['overview'];
-            $posterPath = !empty($movie['poster_path']) 
-                ? "https://image.tmdb.org/t/p/w500" . $movie['poster_path'] 
-                : "https://via.placeholder.com/500x750?text=No+Image"; // Default placeholder image
+            $posterPath = !empty($movie['poster_path']) ? "https://image.tmdb.org/t/p/w500" . $movie['poster_path'] : "https://via.placeholder.com/500x750?text=No+Image";
             $releaseDate = !empty($movie['release_date']) ? $movie['release_date'] : null;
-            $price = rand(599, 1999) / 100; // Random price between 5.99 and 19.99
-        
-            // Insert into database or update if it already exists
+            $price = rand(599, 1999) / 100;
+
             $stmt = $conn->prepare("INSERT INTO movies (title, description, poster_path, release_date, price, created_at, updated_at) 
                                     VALUES (:title, :description, :poster_path, :release_date, :price, NOW(), NOW())
                                     ON DUPLICATE KEY UPDATE 
@@ -79,17 +80,15 @@ if (isset($_GET['q']) && !empty($_GET['q'])) {
             ]);
         }
 
-        // Retrieve search results from the database
-        $searchQuery = "SELECT id, title, description, poster_path, price FROM movies 
-                        WHERE title LIKE :query OR description LIKE :query 
-                        ORDER BY created_at DESC";
+        $searchQuery = "SELECT id, title, description, poster_path, price FROM movies WHERE title LIKE :query OR description LIKE :query ORDER BY created_at DESC";
         $stmt = $conn->prepare($searchQuery);
         $searchTerm = '%' . $query . '%';
-        $stmt->bindParam(':query', $searchTerm);
+        $stmt->bindParam(':query', $searchTerm, PDO::PARAM_STR);
         $stmt->execute();
         $searchResults = $stmt->fetchAll(PDO::FETCH_ASSOC);
     } catch (Exception $e) {
-        $errorMessages[] = "Erreur lors de la recherche: " . $e->getMessage();
+        error_log($e->getMessage());
+        $errorMessages[] = "Une erreur est survenue. Veuillez réessayer.";
     }
 }
 ?>
@@ -107,54 +106,42 @@ if (isset($_GET['q']) && !empty($_GET['q'])) {
         <a href="index.php" class="logo">CINEMAX</a>
         <div class="search-container">
             <form action="recherche.php" method="GET">
-                <input type="text" name="q" class="search-input" placeholder="Rechercher..." value="<?php echo htmlspecialchars($_GET['q'] ?? ''); ?>">
+                <input type="text" name="q" class="search-input" placeholder="Rechercher..." value="<?php echo htmlspecialchars($_GET['q'] ?? '', ENT_QUOTES, 'UTF-8'); ?>">
                 <button type="submit" class="search-button">Rechercher</button>
             </form>
         </div>
         <div class="nav-links">
-            <?php 
-            if (isset($_SESSION['user_id'])) {
-                echo '<a href="utilisateur/user.php">Profil</a>';
-                echo '<a href="utilisateur/panier.php" class="image-swap-container"><div class="image-swap-container">
-                            <img class="default" src="assets/photo/shop2.png" alt="Boutique">
-                            <img class="hover" src="assets/photo/shop.png" alt="Boutique survolée">
-                    </div></a>';
-            } 
-            
-            if (!isset($_SESSION['user_id'])) {
-                echo '<a href="login/login.php">Se connecter</a>';
-                echo '<a href="login/register.php">Nouveau compte</a>';
-            } else {
-                echo '<a href="login/logout.php">Se déconnecter</a>';
-            }
-            ?>
+            <?php if (isset($_SESSION['user_id'])): ?>
+                <a href="utilisateur/user.php">Profil</a>
+                <a href="utilisateur/panier.php" class="image-swap-container">
+                    <img class="default" src="assets/photo/shop2.png" alt="Boutique">
+                    <img class="hover" src="assets/photo/shop.png" alt="Boutique survolée">
+                </a>
+                <a href="login/logout.php">Se déconnecter</a>
+            <?php else: ?>
+                <a href="login/login.php">Se connecter</a>
+                <a href="login/register.php">Nouveau compte</a>
+            <?php endif; ?>
         </div>
     </header>
-
     <main>
         <h1>Résultats de recherche</h1>
-
-        <!-- Affichage des erreurs -->
         <?php if (!empty($errorMessages)): ?>
             <?php foreach ($errorMessages as $error): ?>
-                <div class="alert alert-danger"><?php echo htmlspecialchars($error); ?></div>
+                <div class="alert alert-danger"><?php echo htmlspecialchars($error, ENT_QUOTES, 'UTF-8'); ?></div>
             <?php endforeach; ?>
         <?php endif; ?>
-
         <?php if (!empty($searchResults)): ?>
             <div class="movie-grid">
                 <?php foreach ($searchResults as $movie): ?>
                     <div class="movie-card">
                         <a href="movies.php?id=<?php echo $movie['id']; ?>">
-                            <img src="<?php echo htmlspecialchars($movie['poster_path']); ?>" alt="<?php echo htmlspecialchars($movie['title']); ?>" class="movie-poster">
+                            <img src="<?php echo htmlspecialchars($movie['poster_path'], ENT_QUOTES, 'UTF-8'); ?>" alt="<?php echo htmlspecialchars($movie['title'], ENT_QUOTES, 'UTF-8'); ?>" class="movie-poster">
                         </a>
                         <div class="movie-info">
-                            <a href="movies.php?id=<?php echo $movie['id']; ?>" class="movie-title">
-                                <?php echo htmlspecialchars($movie['title']); ?>
-                            </a>
-                            <div class="movie-price"><?php echo htmlspecialchars(number_format($movie['price'], 2)); ?> </div>
-                            <p class="movie-desc"><?php echo htmlspecialchars(substr($movie['description'], 0, 50)) . '...'; ?></p>
-                            
+                            <a href="movies.php?id=<?php echo $movie['id']; ?>" class="movie-title"><?php echo htmlspecialchars($movie['title'], ENT_QUOTES, 'UTF-8'); ?></a>
+                            <div class="movie-price"><?php echo htmlspecialchars(number_format($movie['price'], 2), ENT_QUOTES, 'UTF-8'); ?> </div>
+                            <p class="movie-desc"><?php echo htmlspecialchars(substr($movie['description'], 0, 50), ENT_QUOTES, 'UTF-8') . '...'; ?></p>
                             <?php if (isset($_SESSION['user_id'])): ?>
                                 <form method="POST" class="add-to-cart-form">
                                     <input type="hidden" name="movie_id" value="<?php echo $movie['id']; ?>">
@@ -168,7 +155,7 @@ if (isset($_GET['q']) && !empty($_GET['q'])) {
                 <?php endforeach; ?>
             </div>
         <?php else: ?>
-            <p class="no-content">Aucun résultat trouvé pour "<?php echo htmlspecialchars($_GET['q']); ?>".</p>
+            <p class="no-content">Aucun résultat trouvé pour "<?php echo htmlspecialchars($_GET['q'] ?? '', ENT_QUOTES, 'UTF-8'); ?>".</p>
         <?php endif; ?>
     </main>
 </body>
