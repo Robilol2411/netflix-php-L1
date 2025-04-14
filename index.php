@@ -124,7 +124,7 @@ if (isset($_POST['add_to_cart']) && isset($_POST['movie_id']) && isset($_SESSION
                         </a>
                         <div class="movie-info">
                             <a href="movies.php?id=<?php echo $film['id']; ?>" class="movie-title"><?php echo htmlspecialchars($film['title']); ?></a>
-                            <div class="movie-price"><?php echo htmlspecialchars(number_format($film['price'], 2)); ?> €</div>
+                            <div class="movie-price"><?php echo htmlspecialchars(number_format($film['price'], 2)); ?> </div>
                             <p class="movie-desc"><?php echo htmlspecialchars(substr($film['description'], 0, 50)) . '...'; ?></p>
                             <?php if (isset($_SESSION['user_id'])): ?>
                                 <form method="POST" class="add-to-cart-form">
