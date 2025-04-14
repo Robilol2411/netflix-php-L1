@@ -96,10 +96,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['change_password'])) {
         </div>
         <div class="nav-links">
             <?php if (isset($_SESSION['user_id'])): ?>
-                <a href="../utilisateur/panier.php" class="image-swap-container">
-                    <img class="default" src="../assets/photo/shop2.png" alt="Boutique">
-                    <img class="hover" src="../assets/photo/shop.png" alt="Boutique survolée">
-                </a>
+                <a href="../utilisateur/panier.php" class="image-swap-container"><div class="image-swap-container">
+                        <img class="default" src="../assets/photo/shop2.png" alt="Boutique">
+                        <img class="hover" src="../assets/photo/shop.png" alt="Boutique survolée">
+                </div></a>
                 <a href="../login/logout.php">Déconnexion</a>
             <?php endif; ?>
         </div>

@@ -139,10 +139,10 @@ function getGenreName($genreId, $apiKey) {
         <div class="nav-links">
             <?php if (isset($_SESSION['user_id'])): ?>
                 <a href="utilisateur/user.php">Profil</a>
-                <a href="utilisateur/panier.php" class="image-swap-container">
-                    <img class="default" src="assets/photo/shop2.png" alt="Boutique">
-                    <img class="hover" src="assets/photo/shop.png" alt="Boutique survolée">
-                </a>
+                <a href="utilisateur/panier.php" class="image-swap-container"><div class="image-swap-container">
+                        <img class="default" src="assets/photo/shop2.png" alt="Boutique">
+                        <img class="hover" src="assets/photo/shop.png" alt="Boutique survolée">
+                </div></a>
                 <a href="login/logout.php">Se déconnecter</a>
             <?php else: ?>
                 <a href="login/login.php">Se connecter</a>
