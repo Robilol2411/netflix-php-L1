@@ -56,31 +56,39 @@ if (isset($_GET['q']) && !empty($_GET['q'])) {
 
     try {
         $response = file_get_contents($url);
-        $movies = json_decode($response, true)['results'];
-        foreach ($movies as $movie) {
-            $title = $movie['title'];
-            $description = $movie['overview'];
-            $posterPath = !empty($movie['poster_path']) ? "https://image.tmdb.org/t/p/w500" . $movie['poster_path'] : "https://via.placeholder.com/500x750?text=No+Image";
-            $releaseDate = !empty($movie['release_date']) ? $movie['release_date'] : null;
-            $price = rand(599, 1999) / 100;
+        $movies = json_decode($response, true)['results'] ?? [];
 
-            $stmt = $conn->prepare("INSERT INTO movies (title, description, poster_path, release_date, price, created_at, updated_at) 
-                                    VALUES (:title, :description, :poster_path, :release_date, :price, NOW(), NOW())
-                                    ON DUPLICATE KEY UPDATE 
-                                        updated_at = NOW(), 
-                                        description = VALUES(description), 
-                                        poster_path = VALUES(poster_path), 
-                                        release_date = VALUES(release_date)");
-            $stmt->execute([
-                ':title' => $title,
-                ':description' => $description,
-                ':poster_path' => $posterPath,
-                ':release_date' => $releaseDate,
-                ':price' => $price,
-            ]);
+        if (empty($movies)) {
+            $errorMessages[] = "Aucun film trouvé pour votre recherche.";
+        } else {
+            foreach ($movies as $movie) {
+                $title = $movie['title'];
+                $description = $movie['overview'];
+                $posterPath = !empty($movie['poster_path']) ? "https://image.tmdb.org/t/p/w500" . $movie['poster_path'] : "https://via.placeholder.com/500x750?text=No+Image";
+                $releaseDate = !empty($movie['release_date']) ? $movie['release_date'] : null;
+                $price = rand(599, 1999) / 100;
+                $category = !empty($movie['genre_ids']) ? getGenreName($movie['genre_ids'][0], $apiKey) : 'unknown';
+
+                $stmt = $conn->prepare("INSERT INTO movies (title, description, poster_path, release_date, price, category, created_at, updated_at) 
+                                        VALUES (:title, :description, :poster_path, :release_date, :price, :category, NOW(), NOW())
+                                        ON DUPLICATE KEY UPDATE 
+                                            updated_at = NOW(), 
+                                            description = VALUES(description), 
+                                            poster_path = VALUES(poster_path), 
+                                            release_date = VALUES(release_date), 
+                                            category = VALUES(category)");
+                $stmt->execute([
+                    ':title' => $title,
+                    ':description' => $description,
+                    ':poster_path' => $posterPath,
+                    ':release_date' => $releaseDate,
+                    ':price' => $price,
+                    ':category' => $category,
+                ]);
+            }
         }
 
-        $searchQuery = "SELECT id, title, description, poster_path, price FROM movies WHERE title LIKE :query OR description LIKE :query ORDER BY created_at DESC";
+        $searchQuery = "SELECT id, title, description, poster_path, price, category FROM movies WHERE title LIKE :query OR description LIKE :query ORDER BY created_at DESC";
         $stmt = $conn->prepare($searchQuery);
         $searchTerm = '%' . $query . '%';
         $stmt->bindParam(':query', $searchTerm, PDO::PARAM_STR);
@@ -88,8 +96,26 @@ if (isset($_GET['q']) && !empty($_GET['q'])) {
         $searchResults = $stmt->fetchAll(PDO::FETCH_ASSOC);
     } catch (Exception $e) {
         error_log($e->getMessage());
-        $errorMessages[] = "Une erreur est survenue. Veuillez réessayer.";
+        $errorMessages[] = "Une erreur est survenue lors de la récupération des films.";
     }
+}
+
+function getGenreName($genreId, $apiKey) {
+    static $genres = null;
+
+    if ($genres === null) {
+        $url = "https://api.themoviedb.org/3/genre/movie/list?api_key=$apiKey&language=en-US";
+        $response = file_get_contents($url);
+        $genres = json_decode($response, true)['genres'] ?? [];
+    }
+
+    foreach ($genres as $genre) {
+        if ($genre['id'] == $genreId) {
+            return $genre['name'];
+        }
+    }
+
+    return 'unknown';
 }
 ?>
 
@@ -98,7 +124,7 @@ if (isset($_GET['q']) && !empty($_GET['q'])) {
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Résultats de recherche - LoueTonFilm.com</title>
+    <title>Résultats de recherche - CINEMAX</title>
     <link href="assets/style_index.css" rel="stylesheet">
 </head>
 <body>
@@ -141,6 +167,7 @@ if (isset($_GET['q']) && !empty($_GET['q'])) {
                         <div class="movie-info">
                             <a href="movies.php?id=<?php echo $movie['id']; ?>" class="movie-title"><?php echo htmlspecialchars($movie['title'], ENT_QUOTES, 'UTF-8'); ?></a>
                             <div class="movie-price"><?php echo htmlspecialchars(number_format($movie['price'], 2), ENT_QUOTES, 'UTF-8'); ?> </div>
+                            <p class="movie-category"><strong>Catégorie:</strong> <?php echo htmlspecialchars($movie['category'], ENT_QUOTES, 'UTF-8'); ?></p>
                             <p class="movie-desc"><?php echo htmlspecialchars(substr($movie['description'], 0, 50), ENT_QUOTES, 'UTF-8') . '...'; ?></p>
                             <?php if (isset($_SESSION['user_id'])): ?>
                                 <form method="POST" class="add-to-cart-form">

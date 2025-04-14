@@ -114,6 +114,15 @@ if (isset($_POST['add_to_cart']) && isset($_POST['movie_id']) && isset($_SESSION
         <?php endif; ?>
         <h1>Bienvenue sur CINEMAX</h1>
         <h2>Revendeur officiel des meilleurs films du moment</h2>
+
+        <div class="category-buttons">
+            <a href="categories/documentaire.php" class="category-btn">documentaire</a>
+            <a href="categories/action.php" class="category-btn">Action</a>
+            <a href="categories/horreur.php" class="category-btn">Horreur</a>
+            <a href="categories/animation.php" class="category-btn">Animation</a>
+            <a href="categories/drama.php" class="category-btn">Drama</a>
+        </div>
+
         <h2 class="section-title">Découvrez notre sélection</h2>
         <?php if (!empty($films)): ?>
             <div class="movie-grid">
