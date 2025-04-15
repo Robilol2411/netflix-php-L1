@@ -60,9 +60,11 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" &&
 
 </head>
 <body>
-<header>
-    <a href="..\index.php">Acceuil</a>
-</header>
+<header class="navbar">
+        <a href="..\index.php" class="logo">CINEMAX</a>
+        <div class="search-container">
+        </div>
+    </header>
     <div class="center">
         <form class="form" action="register.php" method="post">
             <span class="input-span">

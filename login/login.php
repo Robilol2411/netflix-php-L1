@@ -14,7 +14,9 @@ require "../baseDD/database.php";
 </head>
 <body>
 <header class="navbar">
-        <a href="../index.php" class="logo">CINEMAX</a>
+        <a href="..\index.php" class="logo">CINEMAX</a>
+        <div class="search-container">
+        </div>
     </header>
     <div class="center">
         <form class="form" action="login.php" method="post">

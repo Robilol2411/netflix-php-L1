@@ -115,6 +115,32 @@ if (isset($_POST['add_to_cart']) && isset($_POST['movie_id']) && isset($_SESSION
         <h1>Bienvenue sur CINEMAX</h1>
         <h2>Revendeur officiel des meilleurs films du moment</h2>
 
+        <div class="carousel-container">
+    <div class="carousel-track">
+        <?php 
+        try {
+        $carouselQuery = "SELECT id, title, poster_path FROM movies ORDER BY RAND()";
+        $stmt = $conn->prepare($carouselQuery);
+        $stmt->execute();
+        $carouselFilms = $stmt->fetchAll(PDO::FETCH_ASSOC);
+        
+        foreach ($carouselFilms as $film): ?>
+            <div class="carousel-item">
+            <a href="movies.php?id=<?php echo $film['id']; ?>">
+                <img src="<?php echo htmlspecialchars($film['poster_path']); ?>" alt="<?php echo htmlspecialchars($film['title']); ?>" class="carousel-image">
+                <div class="carousel-title"><?php echo htmlspecialchars($film['title']); ?></div>
+            </a>
+            </div>
+        <?php endforeach;
+        } catch (Exception $e) {
+        echo '<div class="alert alert-danger">Erreur lors du chargement du carrousel.</div>';
+        }
+        ?>
+    </div>
+    <button class="carousel-button prev" aria-label="Film précédent">❮</button>
+    <button class="carousel-button next" aria-label="Film suivant">❯</button>
+    </div>
+
         <div class="category-buttons">
             <a href="categories/documentaire.php" class="category-btn">documentaire</a>
             <a href="categories/action.php" class="category-btn">Action</a>
@@ -150,6 +176,7 @@ if (isset($_POST['add_to_cart']) && isset($_POST['movie_id']) && isset($_SESSION
         <?php else: ?>
             <p class="no-content">Aucun film n'est disponible pour le moment.</p>
         <?php endif; ?>
+        <script src="js\carroussel.js"></script>
     </main>
 </body>
 </html>
