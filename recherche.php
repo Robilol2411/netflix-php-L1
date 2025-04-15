@@ -62,22 +62,27 @@ if (isset($_GET['q']) && !empty($_GET['q'])) {
             $errorMessages[] = "Aucun film trouvé pour votre recherche.";
         } else {
             foreach ($movies as $movie) {
+                $tmdb_id = $movie['id'];
                 $title = $movie['title'];
                 $description = $movie['overview'];
-                $posterPath = !empty($movie['poster_path']) ? "https://image.tmdb.org/t/p/w500" . $movie['poster_path'] : "https://via.placeholder.com/500x750?text=No+Image";
+                $posterPath = !empty($movie['poster_path']) 
+                    ? "https://image.tmdb.org/t/p/w500" . $movie['poster_path'] 
+                    : "assets/photo/not_found.png";
                 $releaseDate = !empty($movie['release_date']) ? $movie['release_date'] : null;
                 $price = rand(599, 1999) / 100;
                 $category = !empty($movie['genre_ids']) ? getGenreName($movie['genre_ids'][0], $apiKey) : 'unknown';
 
-                $stmt = $conn->prepare("INSERT INTO movies (title, description, poster_path, release_date, price, category, created_at, updated_at) 
-                                        VALUES (:title, :description, :poster_path, :release_date, :price, :category, NOW(), NOW())
+                $stmt = $conn->prepare("INSERT INTO movies (tmdb_id, title, description, poster_path, release_date, price, category, created_at, updated_at) 
+                                        VALUES (:tmdb_id, :title, :description, :poster_path, :release_date, :price, :category, NOW(), NOW())
                                         ON DUPLICATE KEY UPDATE 
+                                            tmdb_id = VALUES(tmdb_id),
                                             updated_at = NOW(), 
                                             description = VALUES(description), 
                                             poster_path = VALUES(poster_path), 
                                             release_date = VALUES(release_date), 
                                             category = VALUES(category)");
                 $stmt->execute([
+                    ':tmdb_id' => $tmdb_id,
                     ':title' => $title,
                     ':description' => $description,
                     ':poster_path' => $posterPath,
@@ -88,7 +93,7 @@ if (isset($_GET['q']) && !empty($_GET['q'])) {
             }
         }
 
-        $searchQuery = "SELECT id, title, description, poster_path, price, category FROM movies WHERE title LIKE :query OR description LIKE :query ORDER BY created_at DESC";
+        $searchQuery = "SELECT id, tmdb_id, title, description, poster_path, price, category FROM movies WHERE title LIKE :query OR description LIKE :query ORDER BY created_at DESC";
         $stmt = $conn->prepare($searchQuery);
         $searchTerm = '%' . $query . '%';
         $stmt->bindParam(':query', $searchTerm, PDO::PARAM_STR);
