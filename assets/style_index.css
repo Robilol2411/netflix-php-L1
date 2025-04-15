@@ -739,39 +739,164 @@ body {
 @media (max-width: 768px) {
   .navbar {
     flex-direction: column;
-    align-items: flex-start;
-    padding: 1rem;
+    padding: 10px;
   }
-
-  .navbar a {
-    margin: 0.5rem 0;
-    font-size: 1rem;
+  
+  .navbar .logo {
+    margin-bottom: 10px;
   }
-
-  .grid-container {
-    grid-template-columns: 1fr; /* une seule colonne sur mobile */
+  
+  .navbar .nav-links {
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 10px;
   }
-
-  .carousel-item {
-    height: 200px; /* réduire la hauteur sur mobile */
-  }
-
-  .movie-card {
-    padding: 0.5rem;
+  
+  .navbar .nav-links a {
     font-size: 0.9rem;
+    padding: 8px 15px;
   }
-
-  .add-to-cart-btn {
-    padding: 0.4rem 0.8rem;
-    font-size: 0.9rem;
+  
+  .search-container {
+    margin: 10px 0;
+  }
+  
+  .search-input {
+    width: 180px;
+  }
+  
+  .search-input:hover, .search-input:focus {
+    width: 220px;
   }
 }
-@media (max-width: 768px) {
-  header {
-    padding: 1rem 1.5rem;
-    font-size: 1.2rem;
+
+/* Adaptations pour les très petits écrans */
+@media (max-width: 480px) {
+  h1 {
+    font-size: 1.8rem;
+  }
+  
+  h2 {
+    font-size: 1.4rem;
+  }
+  
+  h2.section-title {
+    font-size: 1.3rem;
+  }
+  
+  .carousel-container {
+    margin: 20px auto;
+  }
+  
+  .carousel-item {
+    min-width: 120px;
+  }
+  
+  .carousel-image {
+    height: 180px;
+  }
+  
+  .carousel-title {
+    font-size: 0.8rem;
+    padding: 10px 5px 5px;
+  }
+  
+  .carousel-button {
+    width: 30px;
+    height: 30px;
+    font-size: 0.9rem;
+  }
+  
+  .movie-grid {
+    grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
+    gap: 10px;
+  }
+  
+  .movie-poster {
+    height: 200px;
+  }
+  
+  .movie-title {
+    font-size: 0.9rem;
+  }
+  
+  .movie-price {
+    font-size: 1rem;
+  }
+  
+  .movie-desc {
+    font-size: 0.8rem;
+    height: 35px;
+  }
+  
+  .add-to-cart-btn,
+  .login-to-buy {
+    font-size: 0.9rem;
+    padding: 8px 15px;
+  }
+}
+
+/* Pour gérer les téléphones en orientation portrait */
+@media (max-width: 360px) {
+  .navbar .nav-links {
     flex-direction: column;
-    align-items: flex-start;
-    gap: 0.5rem;
+    align-items: center;
+  }
+  
+  .carousel-item {
+    min-width: 100px;
+  }
+  
+  .carousel-image {
+    height: 150px;
+  }
+  
+  .movie-grid {
+    grid-template-columns: repeat(auto-fill, minmax(110px, 1fr));
+  }
+  
+  .movie-poster {
+    height: 160px;
+  }
+  
+  .movie-info {
+    padding: 10px;
+  }
+}
+
+/* Pour adapter le carrousel responsive */
+.carousel-container {
+  width: 95%;
+  max-width: 1100px;
+}
+
+.carousel-track {
+  overflow-x: auto;
+  -ms-overflow-style: none;  /* Pour IE et Edge */
+  scrollbar-width: none;  /* Pour Firefox */
+  padding: 15px 40px;
+}
+
+/* Cacher la scrollbar pour Chrome/Safari/Opera */
+.carousel-track::-webkit-scrollbar {
+  display: none;
+}
+
+/* Amélioration du toucher pour mobile */
+@media (hover: none) and (pointer: coarse) {
+  .carousel-button {
+    opacity: 0.8;
+    width: 36px;
+    height: 36px;
+  }
+  
+  .carousel-item:hover {
+    transform: scale(0.98);
+  }
+  
+  .carousel-title {
+    opacity: 1;
+    transform: translateY(0);
+    font-size: 0.8rem;
   }
 }
