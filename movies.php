@@ -1,12 +1,14 @@
 <?php
 session_start();
 require 'baseDD/database.php';
+require 'baseDD/envapi.php';
 
 if (!isset($_GET['id']) || !is_numeric($_GET['id'])) {
     die('Film non trouvé.');
 }
 
 $movieId = (int)$_GET['id'];
+$apiKey = $TMDB_API_KEY;
 
 try {
     $stmt = $conn->prepare("SELECT * FROM movies WHERE id = :id");
@@ -16,6 +18,20 @@ try {
 
     if (!$movie) {
         die('Film introuvable.');
+    }
+
+    $url = "https://api.themoviedb.org/3/movie/$movieId/credits?api_key=$apiKey";
+    $response = file_get_contents($url);
+    $credits = json_decode($response, true);
+
+    $director = null;
+    if (!empty($credits['crew'])) {
+        foreach ($credits['crew'] as $crewMember) {
+            if ($crewMember['job'] === 'Director') {
+                $director = $crewMember;
+                break;
+            }
+        }
     }
 } catch (Exception $e) {
     die("Erreur : " . $e->getMessage());
@@ -42,10 +58,10 @@ try {
         <div class="nav-links">
             <?php if (isset($_SESSION['user_id'])): ?>
                 <a href="utilisateur/user.php">Profil</a>
-                <a href="utilisateur/panier.php" class="image-swap-container"><div class="image-swap-container">
-                        <img class="default" src="assets/photo/shop2.png" alt="Boutique">
-                        <img class="hover" src="assets/photo/shop.png" alt="Boutique survolée">
-                </div></a>
+                <a href="utilisateur/panier.php" class="image-swap-container">
+                    <img class="default" src="assets/photo/shop2.png" alt="Boutique">
+                    <img class="hover" src="assets/photo/shop.png" alt="Boutique survolée">
+                </a>
                 <a href="login/logout.php">Se déconnecter</a>
             <?php else: ?>
                 <a href="login/login.php">Se connecter</a>
@@ -58,6 +74,12 @@ try {
         <img src="<?php echo htmlspecialchars($movie['poster_path']); ?>" alt="<?php echo htmlspecialchars($movie['title']); ?>">
         <p><?php echo htmlspecialchars($movie['description']); ?></p>
         <p>Prix : <?php echo htmlspecialchars(number_format($movie['price'], 2)); ?> €</p>
+        <?php if ($director): ?>
+            <p>Réalisateur : <?php echo htmlspecialchars($director['name']); ?></p>
+            <a href="director.php?director_id=<?php echo htmlspecialchars($director['id']); ?>&director_name=<?php echo urlencode($director['name']); ?>" class="director-btn">Voir les films de <?php echo htmlspecialchars($director['name']); ?></a>
+        <?php else: ?>
+            <p>Réalisateur : Non disponible</p>
+        <?php endif; ?>
     </main>
 </body>
 </html>
