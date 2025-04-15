@@ -13,55 +13,127 @@ $apiKey = $TMDB_API_KEY;
 $errorMessages = [];
 $movies = [];
 
+// Verify the director details
 try {
-    $url = "https://api.themoviedb.org/3/discover/movie?api_key=$apiKey&with_crew=$directorId&language=fr-FR&sort_by=release_date.desc";
+    $directorDetailsUrl = "https://api.themoviedb.org/3/person/$directorId?api_key=$apiKey&language=fr-FR";
+    $directorDetailsResponse = file_get_contents($directorDetailsUrl);
+    $directorDetails = json_decode($directorDetailsResponse, true);
+
+    if (empty($directorDetails) || $directorDetails['name'] !== $directorName) {
+        die('Le réalisateur spécifié est introuvable ou ne correspond pas.');
+    }
+} catch (Exception $e) {
+    die('Erreur lors de la vérification du réalisateur.');
+}
+
+// Handle adding movies to the cart
+if (isset($_POST['add_to_cart']) && isset($_POST['movie_id'])) {
+    $movieId = filter_var($_POST['movie_id'], FILTER_VALIDATE_INT);
+    if (!$movieId) {
+        die('Invalid movie ID.');
+    }
+
+    try {
+        $checkQuery = "SELECT id, quantity FROM cart WHERE user_id = :user_id AND movie_id = :movie_id";
+        $stmt = $conn->prepare($checkQuery);
+        $stmt->bindParam(':user_id', $_SESSION['user_id'], PDO::PARAM_INT);
+        $stmt->bindParam(':movie_id', $movieId, PDO::PARAM_INT);
+        $stmt->execute();
+        $existingItem = $stmt->fetch(PDO::FETCH_ASSOC);
+
+        if ($existingItem) {
+            $newQuantity = $existingItem['quantity'] + 1;
+            $updateQuery = "UPDATE cart SET quantity = :quantity WHERE id = :id";
+            $stmt = $conn->prepare($updateQuery);
+            $stmt->bindParam(':quantity', $newQuantity, PDO::PARAM_INT);
+            $stmt->bindParam(':id', $existingItem['id'], PDO::PARAM_INT);
+            $stmt->execute();
+        } else {
+            $insertQuery = "INSERT INTO cart (user_id, movie_id, quantity) VALUES (:user_id, :movie_id, 1)";
+            $stmt = $conn->prepare($insertQuery);
+            $stmt->bindParam(':user_id', $_SESSION['user_id'], PDO::PARAM_INT);
+            $stmt->bindParam(':movie_id', $movieId, PDO::PARAM_INT);
+            $stmt->execute();
+        }
+        header('Location: director.php?director_id=' . urlencode($directorId) . '&director_name=' . urlencode($directorName) . '&added=1');
+        exit;
+    } catch (Exception $e) {
+        error_log($e->getMessage());
+        $errorMessages[] = "Une erreur est survenue. Veuillez réessayer.";
+    }
+}
+try {
+    $url = "https://api.themoviedb.org/3/person/$directorId/movie_credits?api_key=$apiKey&language=fr-FR";
     $response = file_get_contents($url);
     $data = json_decode($response, true);
 
-    if (!empty($data['results'])) {
-        foreach ($data['results'] as $movie) {
+    if (!empty($data['crew'])) {
+        // Filter only movies where the person is the director
+        $directedMovies = array_filter($data['crew'], function($movie) {
+            return $movie['job'] === 'Director';
+        });
+
+        foreach ($directedMovies as $movie) {
+            $tmdb_id = $movie['id'];
             $title = $movie['title'];
             $description = $movie['overview'];
             $posterPath = !empty($movie['poster_path']) ? "https://image.tmdb.org/t/p/w500" . $movie['poster_path'] : "https://via.placeholder.com/500x750?text=No+Image";
             $releaseDate = !empty($movie['release_date']) ? $movie['release_date'] : null;
             $price = rand(599, 1999) / 100;
-            $category = 'unknown'; 
+            $category = 'unknown';
 
             try {
-                $stmt = $conn->prepare("INSERT INTO movies (title, description, poster_path, release_date, price, category, created_at, updated_at) 
-                                        VALUES (:title, :description, :poster_path, :release_date, :price, :category, NOW(), NOW())
-                                        ON DUPLICATE KEY UPDATE 
-                                            updated_at = NOW(), 
-                                            description = VALUES(description), 
-                                            poster_path = VALUES(poster_path), 
-                                            release_date = VALUES(release_date), 
-                                            category = VALUES(category)");
-                $stmt->execute([
-                    ':title' => $title,
-                    ':description' => $description,
-                    ':poster_path' => $posterPath,
-                    ':release_date' => $releaseDate,
-                    ':price' => $price,
-                    ':category' => $category,
-                ]);
+                // Check if movie already exists by TMDB ID
+                $checkStmt = $conn->prepare("SELECT id FROM movies WHERE tmdb_id = :tmdb_id");
+                $checkStmt->execute([':tmdb_id' => $tmdb_id]);
+                $existingMovie = $checkStmt->fetch(PDO::FETCH_ASSOC);
+
+                if ($existingMovie) {
+                    // Movie exists, use existing ID
+                    $movies[] = [
+                        'id' => $existingMovie['id'],
+                        'tmdb_id' => $tmdb_id,
+                        'title' => $title,
+                        'poster_path' => $posterPath,
+                        'overview' => $description
+                    ];
+                } else {
+                    // Insert new movie
+                    $stmt = $conn->prepare("INSERT INTO movies (tmdb_id, title, description, poster_path, release_date, price, category, created_at, updated_at) 
+                                        VALUES (:tmdb_id, :title, :description, :poster_path, :release_date, :price, :category, NOW(), NOW())");
+                    $stmt->execute([
+                        ':tmdb_id' => $tmdb_id,
+                        ':title' => $title,
+                        ':description' => $description,
+                        ':poster_path' => $posterPath,
+                        ':release_date' => $releaseDate,
+                        ':price' => $price,
+                        ':category' => $category
+                    ]);
+
+                    $newId = $conn->lastInsertId();
+                    $movies[] = [
+                        'id' => $newId,
+                        'tmdb_id' => $tmdb_id,
+                        'title' => $title,
+                        'poster_path' => $posterPath,
+                        'overview' => $description
+                    ];
+                }
             } catch (Exception $e) {
                 error_log("Erreur lors de l'insertion du film : " . $e->getMessage());
             }
-
-            $movies[] = [
-                'id' => $movie['id'],
-                'title' => $title,
-                'poster_path' => $posterPath,
-                'overview' => $description,
-            ];
         }
-    } else {
+    }
+
+    if (empty($movies)) {
         $errorMessages[] = "Aucun film trouvé pour ce réalisateur.";
     }
 } catch (Exception $e) {
     error_log($e->getMessage());
     $errorMessages[] = "Une erreur est survenue lors de la récupération des films.";
 }
+
 ?>
 
 <!DOCTYPE html>
@@ -84,10 +156,10 @@ try {
         <div class="nav-links">
             <?php if (isset($_SESSION['user_id'])): ?>
                 <a href="utilisateur/user.php">Profil</a>
-                <a href="utilisateur/panier.php" class="image-swap-container">
-                    <img class="default" src="assets/photo/shop2.png" alt="Boutique">
-                    <img class="hover" src="assets/photo/shop.png" alt="Boutique survolée">
-                </a>
+                <a href="utilisateur/panier.php" class="image-swap-container"><div class="image-swap-container">
+                        <img class="default" src="assets/photo/shop2.png" alt="Boutique">
+                        <img class="hover" src="assets/photo/shop.png" alt="Boutique survolée">
+                </div></a>
                 <a href="login/logout.php">Se déconnecter</a>
             <?php else: ?>
                 <a href="login/login.php">Se connecter</a>
@@ -112,6 +184,14 @@ try {
                         <div class="movie-info">
                             <a href="movies.php?id=<?php echo htmlspecialchars($movie['id'], ENT_QUOTES, 'UTF-8'); ?>" class="movie-title"><?php echo htmlspecialchars($movie['title'], ENT_QUOTES, 'UTF-8'); ?></a>
                             <p class="movie-desc"><?php echo htmlspecialchars(substr($movie['overview'], 0, 100), ENT_QUOTES, 'UTF-8'); ?>...</p>
+                            <?php if (isset($_SESSION['user_id'])): ?>
+                                <form method="POST" class="add-to-cart-form">
+                                    <input type="hidden" name="movie_id" value="<?php echo htmlspecialchars($movie['id'], ENT_QUOTES, 'UTF-8'); ?>">
+                                    <button type="submit" name="add_to_cart" class="add-to-cart-btn">Ajouter au panier</button>
+                                </form>
+                            <?php else: ?>
+                                <a href="login/login.php" class="login-to-buy">Connectez-vous pour acheter</a>
+                            <?php endif; ?>
                         </div>
                     </div>
                 <?php endforeach; ?>

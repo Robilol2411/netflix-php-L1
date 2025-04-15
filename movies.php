@@ -20,11 +20,12 @@ try {
         die('Film introuvable.');
     }
 
-    $url = "https://api.themoviedb.org/3/movie/$movieId/credits?api_key=$apiKey";
+    // Use tmdb_id for API calls
+    $url = "https://api.themoviedb.org/3/movie/{$movie['tmdb_id']}/credits?api_key=$apiKey";
     $response = @file_get_contents($url);
 
     if ($response === false) {
-        throw new Exception("Impossible de récupérer les crédits pour ce film. L'API a retourné une erreur.");
+        throw new Exception("Impossible de récupérer les crédits pour ce film.");
     }
 
     $credits = json_decode($response, true);

@@ -126,7 +126,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['change_password'])) {
                         <img src="<?php echo htmlspecialchars($film['poster_path'], ENT_QUOTES, 'UTF-8'); ?>" alt="<?php echo htmlspecialchars($film['title'], ENT_QUOTES, 'UTF-8'); ?>" class="movie-poster">
                         <div class="movie-info">
                             <div class="movie-title"><?php echo htmlspecialchars($film['title'], ENT_QUOTES, 'UTF-8'); ?></div>
-                            <div class="movie-price"><?php echo htmlspecialchars(number_format($film['price'], 2), ENT_QUOTES, 'UTF-8'); ?> €</div>
+                            <div class="movie-price"><?php echo htmlspecialchars(number_format($film['price'], 2), ENT_QUOTES, 'UTF-8'); ?> </div>
                             <div class="movie-date">Acheté le: <?php echo htmlspecialchars(date('d/m/Y', strtotime($film['purchase_date'])), ENT_QUOTES, 'UTF-8'); ?></div>
                         </div>
                     </div>
