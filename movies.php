@@ -21,7 +21,12 @@ try {
     }
 
     $url = "https://api.themoviedb.org/3/movie/$movieId/credits?api_key=$apiKey";
-    $response = file_get_contents($url);
+    $response = @file_get_contents($url);
+
+    if ($response === false) {
+        throw new Exception("Impossible de récupérer les crédits pour ce film. L'API a retourné une erreur.");
+    }
+
     $credits = json_decode($response, true);
 
     $director = null;
@@ -34,7 +39,8 @@ try {
         }
     }
 } catch (Exception $e) {
-    die("Erreur : " . $e->getMessage());
+    error_log("Erreur API TMDB : " . $e->getMessage());
+    $director = null;
 }
 ?>
 
@@ -58,10 +64,10 @@ try {
         <div class="nav-links">
             <?php if (isset($_SESSION['user_id'])): ?>
                 <a href="utilisateur/user.php">Profil</a>
-                <a href="utilisateur/panier.php" class="image-swap-container">
-                    <img class="default" src="assets/photo/shop2.png" alt="Boutique">
-                    <img class="hover" src="assets/photo/shop.png" alt="Boutique survolée">
-                </a>
+                <a href="utilisateur/panier.php" class="image-swap-container"><div class="image-swap-container">
+                        <img class="default" src="assets/photo/shop2.png" alt="Boutique">
+                        <img class="hover" src="assets/photo/shop.png" alt="Boutique survolée">
+                </div></a>
                 <a href="login/logout.php">Se déconnecter</a>
             <?php else: ?>
                 <a href="login/login.php">Se connecter</a>
@@ -78,7 +84,7 @@ try {
             <p>Réalisateur : <?php echo htmlspecialchars($director['name']); ?></p>
             <a href="director.php?director_id=<?php echo htmlspecialchars($director['id']); ?>&director_name=<?php echo urlencode($director['name']); ?>" class="director-btn">Voir les films de <?php echo htmlspecialchars($director['name']); ?></a>
         <?php else: ?>
-            <p>Réalisateur : Non disponible</p>
+            <p>Réalisateur : Non disponible ou introuvable.</p>
         <?php endif; ?>
     </main>
 </body>
