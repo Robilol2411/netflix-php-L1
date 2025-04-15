@@ -31,7 +31,7 @@ try {
 }
 
 try {
-    $filmsQuery = "SELECT id, title, description, poster_path, price, release_date FROM movies ORDER BY release_date DESC LIMIT 8";
+    $filmsQuery = "SELECT id, title, description, poster_path, price, release_date FROM movies ORDER BY release_date DESC LIMIT 30";
     $stmt = $conn->prepare($filmsQuery);
     $stmt->execute();
     $films = $stmt->fetchAll(PDO::FETCH_ASSOC);
@@ -132,9 +132,9 @@ if (isset($_POST['add_to_cart']) && isset($_POST['movie_id']) && isset($_SESSION
             </a>
             </div>
         <?php endforeach;
-        } catch (Exception $e) {
-        echo '<div class="alert alert-danger">Erreur lors du chargement du carrousel.</div>';
-        }
+        } catch (Exception $e) { ?>
+        <div class="alert alert-danger">Erreur lors du chargement du carrousel.</div>
+       <?php }
         ?>
     </div>
     <button class="carousel-button prev" aria-label="Film précédent">❮</button>
@@ -176,6 +176,7 @@ if (isset($_POST['add_to_cart']) && isset($_POST['movie_id']) && isset($_SESSION
         <?php else: ?>
             <p class="no-content">Aucun film n'est disponible pour le moment.</p>
         <?php endif; ?>
+        
         <script src="js\carroussel.js"></script>
     </main>
 </body>

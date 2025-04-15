@@ -770,7 +770,6 @@ body {
   }
 }
 
-/* Adaptations pour les très petits écrans */
 @media (max-width: 480px) {
   h1 {
     font-size: 1.8rem;
@@ -836,7 +835,6 @@ body {
   }
 }
 
-/* Pour gérer les téléphones en orientation portrait */
 @media (max-width: 360px) {
   .navbar .nav-links {
     flex-direction: column;
@@ -864,7 +862,6 @@ body {
   }
 }
 
-/* Pour adapter le carrousel responsive */
 .carousel-container {
   width: 95%;
   max-width: 1100px;
@@ -872,17 +869,15 @@ body {
 
 .carousel-track {
   overflow-x: auto;
-  -ms-overflow-style: none;  /* Pour IE et Edge */
-  scrollbar-width: none;  /* Pour Firefox */
+  -ms-overflow-style: none;  
+  scrollbar-width: none;  
   padding: 15px 40px;
 }
 
-/* Cacher la scrollbar pour Chrome/Safari/Opera */
 .carousel-track::-webkit-scrollbar {
   display: none;
 }
 
-/* Amélioration du toucher pour mobile */
 @media (hover: none) and (pointer: coarse) {
   .carousel-button {
     opacity: 0.8;
@@ -900,3 +895,4 @@ body {
     font-size: 0.8rem;
   }
 }
+

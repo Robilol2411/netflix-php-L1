@@ -20,7 +20,6 @@ try {
         die('Film introuvable.');
     }
 
-    // Use tmdb_id for API calls
     $url = "https://api.themoviedb.org/3/movie/{$movie['tmdb_id']}/credits?api_key=$apiKey";
     $response = @file_get_contents($url);
 
@@ -39,9 +38,16 @@ try {
             }
         }
     }
+
+    $mainActors = [];
+    if (!empty($credits['cast'])) {
+        $mainActors = array_slice($credits['cast'], 0, 5);
+    }
+
 } catch (Exception $e) {
     error_log("Erreur API TMDB : " . $e->getMessage());
     $director = null;
+    $mainActors = [];
 }
 ?>
 
@@ -51,7 +57,7 @@ try {
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title><?php echo htmlspecialchars($movie['title']); ?> - CINEMAX</title>
-    <link href="assets/style_index.css" rel="stylesheet">
+    <link href="assets/style_movies.css" rel="stylesheet">
 </head>
 <body>
     <header class="navbar">
@@ -65,10 +71,12 @@ try {
         <div class="nav-links">
             <?php if (isset($_SESSION['user_id'])): ?>
                 <a href="utilisateur/user.php">Profil</a>
-                <a href="utilisateur/panier.php" class="image-swap-container"><div class="image-swap-container">
+                <a href="utilisateur/panier.php" class="image-swap-container">
+                    <div class="image-swap-container">
                         <img class="default" src="assets/photo/shop2.png" alt="Boutique">
                         <img class="hover" src="assets/photo/shop.png" alt="Boutique survolée">
-                </div></a>
+                    </div>
+                </a>
                 <a href="login/logout.php">Se déconnecter</a>
             <?php else: ?>
                 <a href="login/login.php">Se connecter</a>
@@ -76,17 +84,44 @@ try {
             <?php endif; ?>
         </div>
     </header>
-    <main>
+
+    <main class="movie-container">
         <h1><?php echo htmlspecialchars($movie['title']); ?></h1>
-        <img src="<?php echo htmlspecialchars($movie['poster_path']); ?>" alt="<?php echo htmlspecialchars($movie['title']); ?>">
-        <p><?php echo htmlspecialchars($movie['description']); ?></p>
-        <p>Prix : <?php echo htmlspecialchars(number_format($movie['price'], 2)); ?> €</p>
-        <?php if ($director): ?>
-            <p>Réalisateur : <?php echo htmlspecialchars($director['name']); ?></p>
-            <a href="director.php?director_id=<?php echo htmlspecialchars($director['id']); ?>&director_name=<?php echo urlencode($director['name']); ?>" class="director-btn">Voir les films de <?php echo htmlspecialchars($director['name']); ?></a>
-        <?php else: ?>
-            <p>Réalisateur : Non disponible ou introuvable.</p>
-        <?php endif; ?>
+        <div class="movie-content">
+            <img src="<?php echo htmlspecialchars($movie['poster_path']); ?>" alt="<?php echo htmlspecialchars($movie['title']); ?>" class="movie-poster">
+            <div class="movie-info">
+                <p class="description"><?php echo htmlspecialchars($movie['description']); ?></p>
+                <p class="price">Prix : <strong><?php echo htmlspecialchars(number_format($movie['price'], 2)); ?> €</strong></p>
+
+                <?php if ($director): ?>
+                    <p class="director">Réalisateur : <strong><?php echo htmlspecialchars($director['name']); ?></strong></p>
+                    <a href="director.php?director_id=<?php echo htmlspecialchars($director['id']); ?>&director_name=<?php echo urlencode($director['name']); ?>" class="director-btn">
+                        Voir les films de <?php echo htmlspecialchars($director['name']); ?>
+                    </a>
+                <?php else: ?>
+                    <p class="director">Réalisateur : Non disponible.</p>
+                <?php endif; ?>
+
+                <?php if (!empty($mainActors)): ?>
+                    <div class="actors">
+                        <h3>Acteurs principaux :</h3>
+                        <ul>
+                            <?php foreach ($mainActors as $actor): ?>
+                                <li><?php echo htmlspecialchars($actor['name']); ?> (<?php echo htmlspecialchars($actor['character']); ?>)</li>
+                            <?php endforeach; ?>
+                        </ul>
+                    </div>
+                <?php endif; ?>
+            </div>
+        </div>
+        <?php if (isset($_SESSION['user_id'])): ?>
+                <form method="POST" action="index.php">
+                    <input type="hidden" name="movie_id" value="<?php echo $movie['id']; ?>">
+                    <button type="submit" name="add_to_cart" class="director-btn">Ajouter au panier</button>
+                </form>
+            <?php else: ?>
+                <a href="login/login.php" class="director-btn">Connectez-vous pour acheter</a>
+            <?php endif; ?>
     </main>
 </body>
 </html>

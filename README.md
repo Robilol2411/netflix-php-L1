@@ -39,6 +39,7 @@ Installation :
    - Dans le dossier baseDD : 
         - Créer un fichier env.php et y copier les données de env-exemple.php, en remplaçant par vos informations
         - Créer un fichier envapi.php et y copier les données de envapi-exemple.php, en y ajoutant votre propre clé API TMDB (obtenue sur https://www.themoviedb.org/)
+        - Dans script.js mettre votre clé api
 
 5) Installation de la Base de donnée
    - Ouvrir votre navigateur et aller sur : http://localhost:8080
@@ -49,6 +50,12 @@ Installation :
    - Lancer l’importation
 
 Votre site est maintenant fonctionnel.
+
+--------------------------------------------
+
+Compte avec des films : 
+email : test@gmail.com
+mot de passe : test
 
 --------------------------------------------
 

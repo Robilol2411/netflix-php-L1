@@ -1,11 +1,9 @@
 const axios = require('axios');
 const fs = require('fs');
 
-// TMDB API Key
-const API_KEY = 'b4d10555719ced3748435bc30d8b3f7b'; // Replace with your TMDB API key
+const API_KEY = 'VOTRE_KEY';
 const BASE_URL = 'https://api.themoviedb.org/3';
 
-// Fetch movies from TMDB
 async function fetchMovies(page = 1) {
     try {
         const response = await axios.get(`${BASE_URL}/movie/popular`, {
@@ -22,7 +20,6 @@ async function fetchMovies(page = 1) {
     }
 }
 
-// Generate SQL INSERT statements
 function generateSQL(movies) {
     let sql = '';
     movies.forEach((movie) => {
@@ -30,23 +27,21 @@ function generateSQL(movies) {
         const description = movie.overview.replace(/'/g, "''");
         const posterPath = `https://image.tmdb.org/t/p/w500${movie.poster_path}`;
         const releaseDate = movie.release_date || 'NULL';
-        const price = (Math.random() * (19.99 - 5.99) + 5.99).toFixed(2); // Random price between 5.99 and 19.99
+        const price = (Math.random() * (19.99 - 5.99) + 5.99).toFixed(2);
 
         sql += `INSERT INTO movies (title, description, poster_path, release_date, price, created_at, updated_at) VALUES ('${title}', '${description}', '${posterPath}', '${releaseDate}', ${price}, NOW(), NOW());\n`;
     });
     return sql;
 }
 
-// Main function
 async function main() {
     let allSQL = '';
-    for (let page = 1; page <= 5; page++) { // Fetch 5 pages of movies (100 movies)
+    for (let page = 1; page <= 5; page++) { 
         console.log(`Fetching page ${page}...`);
         const movies = await fetchMovies(page);
         allSQL += generateSQL(movies);
     }
 
-    // Save SQL to a file
     fs.writeFileSync('movies_insert.sql', allSQL, 'utf8');
     console.log('SQL file generated: movies_insert.sql');
 }
@@ -59,9 +54,8 @@ document.getElementById('search-button').addEventListener('click', async () => {
         const response = await fetch(`search.php?q=${encodeURIComponent(query)}`);
         const movies = await response.json();
 
-        // Display results
         const resultsContainer = document.getElementById('search-results');
-        resultsContainer.innerHTML = ''; // Clear previous results
+        resultsContainer.innerHTML = ''; 
 
         movies.forEach((movie) => {
             const movieCard = `

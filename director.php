@@ -13,7 +13,6 @@ $apiKey = $TMDB_API_KEY;
 $errorMessages = [];
 $movies = [];
 
-// Verify the director details
 try {
     $directorDetailsUrl = "https://api.themoviedb.org/3/person/$directorId?api_key=$apiKey&language=fr-FR";
     $directorDetailsResponse = file_get_contents($directorDetailsUrl);
@@ -26,7 +25,6 @@ try {
     die('Erreur lors de la vérification du réalisateur.');
 }
 
-// Handle adding movies to the cart
 if (isset($_POST['add_to_cart']) && isset($_POST['movie_id'])) {
     $movieId = filter_var($_POST['movie_id'], FILTER_VALIDATE_INT);
     if (!$movieId) {
@@ -68,7 +66,6 @@ try {
     $data = json_decode($response, true);
 
     if (!empty($data['crew'])) {
-        // Filter only movies where the person is the director
         $directedMovies = array_filter($data['crew'], function($movie) {
             return $movie['job'] === 'Director';
         });
@@ -83,13 +80,11 @@ try {
             $category = 'unknown';
 
             try {
-                // Check if movie already exists by TMDB ID
                 $checkStmt = $conn->prepare("SELECT id FROM movies WHERE tmdb_id = :tmdb_id");
                 $checkStmt->execute([':tmdb_id' => $tmdb_id]);
                 $existingMovie = $checkStmt->fetch(PDO::FETCH_ASSOC);
 
                 if ($existingMovie) {
-                    // Movie exists, use existing ID
                     $movies[] = [
                         'id' => $existingMovie['id'],
                         'tmdb_id' => $tmdb_id,
@@ -98,7 +93,6 @@ try {
                         'overview' => $description
                     ];
                 } else {
-                    // Insert new movie
                     $stmt = $conn->prepare("INSERT INTO movies (tmdb_id, title, description, poster_path, release_date, price, category, created_at, updated_at) 
                                         VALUES (:tmdb_id, :title, :description, :poster_path, :release_date, :price, :category, NOW(), NOW())");
                     $stmt->execute([
