@@ -65,7 +65,9 @@ if (isset($_GET['q']) && !empty($_GET['q'])) {
                 $tmdb_id = $movie['id'];
                 $title = $movie['title'];
                 $description = $movie['overview'];
-                $posterPath = !empty($movie['poster_path']) ? "https://image.tmdb.org/t/p/w500" . $movie['poster_path'] : "https://via.placeholder.com/500x750?text=No+Image";
+                $posterPath = !empty($movie['poster_path']) 
+                    ? "https://image.tmdb.org/t/p/w500" . $movie['poster_path'] 
+                    : "assets/photo/not_found.png";
                 $releaseDate = !empty($movie['release_date']) ? $movie['release_date'] : null;
                 $price = rand(599, 1999) / 100;
                 $category = !empty($movie['genre_ids']) ? getGenreName($movie['genre_ids'][0], $apiKey) : 'unknown';
