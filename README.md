@@ -32,7 +32,7 @@ Installation :
 
 3) Installation du projet sur votre VS Code 
    - Ouvrir un terminal
-   - git clone https://github.com/Robilol2411/php-crud
+   - git clone https://github.com/Robilol2411/netflix-php-L1
    - Ensuite : cd php-crud
 
 4) Configuration du projet dans VS Code
