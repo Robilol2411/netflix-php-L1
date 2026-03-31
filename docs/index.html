@@ -1,0 +1,280 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CINEMAX - Location de films</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #141414;
+            color: #fff;
+            min-height: 100vh;
+        }
+
+        header {
+            background-color: #000;
+            padding: 20px 40px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .logo {
+            font-size: 2rem;
+            font-weight: bold;
+            color: #e50914;
+            letter-spacing: 3px;
+            text-decoration: none;
+        }
+
+        .hero {
+            text-align: center;
+            padding: 100px 40px 60px;
+            background: linear-gradient(180deg, #000 0%, #141414 100%);
+        }
+
+        .hero h1 {
+            font-size: 3rem;
+            margin-bottom: 16px;
+            color: #fff;
+        }
+
+        .hero p {
+            font-size: 1.2rem;
+            color: #aaa;
+            max-width: 600px;
+            margin: 0 auto 40px;
+            line-height: 1.6;
+        }
+
+        .btn {
+            display: inline-block;
+            background-color: #e50914;
+            color: #fff;
+            padding: 14px 32px;
+            border-radius: 4px;
+            text-decoration: none;
+            font-size: 1rem;
+            font-weight: 600;
+            margin: 8px;
+            transition: background-color 0.2s;
+        }
+
+        .btn:hover {
+            background-color: #b20710;
+        }
+
+        .btn-outline {
+            background-color: transparent;
+            border: 2px solid #fff;
+        }
+
+        .btn-outline:hover {
+            background-color: rgba(255, 255, 255, 0.1);
+        }
+
+        .features {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 24px;
+            justify-content: center;
+            padding: 60px 40px;
+            max-width: 1100px;
+            margin: 0 auto;
+        }
+
+        .feature-card {
+            background-color: #1f1f1f;
+            border-radius: 8px;
+            padding: 32px 24px;
+            width: 280px;
+            text-align: center;
+        }
+
+        .feature-card .icon {
+            font-size: 2.5rem;
+            margin-bottom: 16px;
+        }
+
+        .feature-card h3 {
+            font-size: 1.1rem;
+            margin-bottom: 10px;
+            color: #fff;
+        }
+
+        .feature-card p {
+            color: #aaa;
+            font-size: 0.9rem;
+            line-height: 1.5;
+        }
+
+        .install {
+            background-color: #1f1f1f;
+            padding: 60px 40px;
+            text-align: center;
+        }
+
+        .install h2 {
+            font-size: 2rem;
+            margin-bottom: 32px;
+        }
+
+        .steps {
+            max-width: 700px;
+            margin: 0 auto;
+            text-align: left;
+        }
+
+        .step {
+            display: flex;
+            align-items: flex-start;
+            gap: 16px;
+            margin-bottom: 24px;
+        }
+
+        .step-number {
+            background-color: #e50914;
+            color: #fff;
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            flex-shrink: 0;
+        }
+
+        .step-text h4 {
+            margin-bottom: 4px;
+            font-size: 1rem;
+        }
+
+        .step-text p {
+            color: #aaa;
+            font-size: 0.9rem;
+        }
+
+        .step-text a {
+            color: #e50914;
+            text-decoration: none;
+        }
+
+        footer {
+            background-color: #000;
+            text-align: center;
+            padding: 30px;
+            color: #555;
+            font-size: 0.85rem;
+        }
+
+        .notice {
+            background-color: #2a1a00;
+            border-left: 4px solid #e50914;
+            padding: 16px 24px;
+            max-width: 700px;
+            margin: 0 auto 40px;
+            border-radius: 4px;
+            text-align: left;
+            font-size: 0.95rem;
+            color: #ddd;
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <a class="logo" href="#">CINEMAX</a>
+    </header>
+
+    <section class="hero">
+        <h1>Bienvenue sur CINEMAX</h1>
+        <p>Revendeur officiel des meilleurs films du moment. Découvrez, achetez et gérez votre collection de films en ligne.</p>
+
+        <div class="notice">
+            ⚠️ <strong>Note :</strong> Ce site est une application PHP dynamique avec base de données MySQL. Pour l'utiliser pleinement, installez-le en local en suivant les instructions ci-dessous. GitHub Pages ne prend pas en charge l'exécution de PHP.
+        </div>
+
+        <a href="https://github.com/Robilol2411/netflix-php-L1" class="btn">Voir le code source</a>
+        <a href="https://github.com/Robilol2411/netflix-php-L1#readme" class="btn btn-outline">Documentation</a>
+    </section>
+
+    <section>
+        <div class="features">
+            <div class="feature-card">
+                <div class="icon">🎬</div>
+                <h3>Catalogue de films</h3>
+                <p>Parcourez notre large sélection de films classés par catégories : action, horreur, animation, documentaire et drama.</p>
+            </div>
+            <div class="feature-card">
+                <div class="icon">🔍</div>
+                <h3>Recherche avancée</h3>
+                <p>Trouvez rapidement un film grâce à la barre de recherche connectée à l'API TMDB.</p>
+            </div>
+            <div class="feature-card">
+                <div class="icon">🛒</div>
+                <h3>Panier d'achat</h3>
+                <p>Ajoutez vos films préférés à votre panier et finalisez votre commande en quelques clics.</p>
+            </div>
+            <div class="feature-card">
+                <div class="icon">👤</div>
+                <h3>Profil utilisateur</h3>
+                <p>Créez votre compte, connectez-vous et gérez vos films achetés depuis votre profil personnel.</p>
+            </div>
+        </div>
+    </section>
+
+    <section class="install">
+        <h2>Installation en local</h2>
+        <div class="steps">
+            <div class="step">
+                <div class="step-number">1</div>
+                <div class="step-text">
+                    <h4>Installer Docker</h4>
+                    <p>Téléchargez et installez <a href="https://www.docker.com/" target="_blank">Docker Desktop</a>, puis lancez-le.</p>
+                </div>
+            </div>
+            <div class="step">
+                <div class="step-number">2</div>
+                <div class="step-text">
+                    <h4>Cloner le projet</h4>
+                    <p>Dans un terminal : <code>git clone https://github.com/Robilol2411/netflix-php-L1</code></p>
+                </div>
+            </div>
+            <div class="step">
+                <div class="step-number">3</div>
+                <div class="step-text">
+                    <h4>Configurer les fichiers d'environnement</h4>
+                    <p>Dans le dossier <code>baseDD/</code>, créez <code>env.php</code> et <code>envapi.php</code> à partir des fichiers exemples fournis.</p>
+                </div>
+            </div>
+            <div class="step">
+                <div class="step-number">4</div>
+                <div class="step-text">
+                    <h4>Importer la base de données</h4>
+                    <p>Ouvrez <a href="http://localhost:8080" target="_blank">http://localhost:8080</a>, créez une base de données et importez le fichier <code>monsite.sql</code>.</p>
+                </div>
+            </div>
+            <div class="step">
+                <div class="step-number">5</div>
+                <div class="step-text">
+                    <h4>Lancer l'application</h4>
+                    <p>Ouvrez <a href="http://localhost" target="_blank">http://localhost</a> dans votre navigateur. Le site est prêt !</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <footer>
+        <p>CINEMAX &mdash; Projet sous licence MIT</p>
+    </footer>
+
+</body>
+</html>
